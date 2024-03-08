@@ -9,6 +9,9 @@ body {
     font-size: 72px;
     color: blue;
 }
+#counter {
+    text-align: center;
+}
 #congrats-board {
     background-color: blanchedalmond;
     border: #010101 solid 4px;

@@ -93,6 +93,7 @@ class Model {
       }  
     } else if (cardState == 1){
       // check how two chosen cards should be resolved
+      this.round += 1
       if (this.board[this.pos1].card == this.board[this.pos2].card){
         this.board[this.pos1].state = 2
         this.board[this.pos2].state = 2
@@ -172,7 +173,8 @@ class CardController {
           this.model.pos2 = null
         }, 1000)
       }
-      
+      // update round counter
+      elt('counter').textContent = "Round: " + this.model.round;
     }
   }
 
@@ -212,13 +214,9 @@ class RoundView {
 
   render(){
     const counter = create('h2', -1, 'counter')
-      // Set the text content of the header to "counter"
     counter.textContent = "Round: " + this.model.round;
     document.body.appendChild(counter);
-
   }
-  // subscription to model
-  // when round changes it changes the view count
 }
 
 
