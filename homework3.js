@@ -47,7 +47,7 @@ class Model {
     this.board = this.createBoard(6)
     this.pos1 = null
     this.pos2 = null
-    this.round = null
+    this.round = 1
     // add current round state, increments every time we get a match
     // game over state
     this.changedCardSubscribers = []
@@ -207,6 +207,15 @@ class RoundView {
   constructor(m) {
     this.model = m
     console.log('Set up round view here')
+    this.render()
+  }
+
+  render(){
+    const counter = create('h2', -1, 'counter')
+      // Set the text content of the header to "counter"
+    counter.textContent = "Round: " + this.model.round;
+    document.body.appendChild(counter);
+
   }
   // subscription to model
   // when round changes it changes the view count
