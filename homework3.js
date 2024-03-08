@@ -184,7 +184,7 @@ class CardController {
       case 0:
         elt(card).classList.add("hidden")
         console.log("noneeee")
-        elt(card).style.backgroundImage = 'none'
+        elt(card).style.backgroundImage = "url('./shapes/card-bg.jpg')"
         break
       case 1:
         elt(card).classList.add("chosen")
