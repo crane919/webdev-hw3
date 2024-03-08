@@ -19,6 +19,25 @@ window.onload = () => {
 // You can also change the parameters to existing methods.
 // The current parameters are there mostly to get you started.
 
+function elt(id) {
+  // useful shortcut
+  return document.getElementById(id)
+}
+
+function 
+create(tag, attr, id) {
+  const elt = document.createElement(tag)
+  if (id != -1) {
+    elt.id = id.toString()
+  }
+  if (attr != -1) {
+    for (let at of Object.keys(attr)) {
+      elt.setAttribute(at, attr[at])
+    }
+  }
+  return elt
+}
+
 
 class Model {
 
@@ -60,37 +79,38 @@ class Model {
 
   // Actions.
   actionChooseCard(card) {
-    state = this.board[card].state
+    console.log(card, "cardd")
+    console.log(this.board[card].state)
+    let cardState = this.board[card].state
     // only click on hidden cards
-    if (state == 0){
-      if (this.pos1 == nul){ // first card
+    if (cardState == 0){
+      if (this.pos1 == null){ // first card
         this.board[card].state = 1
-        this.changedCardSubscribers.forEach(card)
+        // BoardView.update_card(card)
+        // this.changedCardSubscribers.forEach(card)
         this.pos1 = card
       } else { // second card
         this.board[card].state = 1
-        this.changedCardSubscribers.forEach(card)
+        //this.changedCardSubscribers.forEach(card)
         this.pos2 = card
         // check match
         if (this.board[this.pos1].card == this.board[this.pos2].card){
           this.board[this.pos1].state = 2
           this.board[this.pos2].state = 2
-          this.changedCardSubscribers.forEach(card)
-          this.changedCardSubscribers.forEach(card)
+          //this.changedCardSubscribers.forEach(card)
+          //this.changedCardSubscribers.forEach(card)
         } else {
           //wait one second
           this.board[this.pos1].state = 0
           this.board[this.pos2].state = 0
-          this.changedCardSubscribers.forEach(card)
-          this.changedCardSubscribers.forEach(card)
+          //this.changedCardSubscribers.forEach(card)
+          //this.changedCardSubscribers.forEach(card)
         }
         this.pos1 = null
         this.pos2 = null
         // check game finished
       }  
-
-    }
-      
+    }  
   }
 
   actionNewGame() {
@@ -107,12 +127,41 @@ class BoardView {
     // subscription to model (change card)
     this.model = m
     console.log('Set up board view here')
+    this.create_board()
   }
 
-  // update card()
-    // check card state and update
+  create_board(){
+    console.log("It's time to create the board")
+    const gameGrid = create('div', -1, 'game-grid')
+    // Create and append the card elements
+    for (let i = 0; i < 12; i++) {
+      const cardDiv = create('div',  {'class':'card hidden', 'data_value':this.model.board[i].card}, i) 
+      cardDiv.addEventListener('click', () => { this.model.actionChooseCard(i)} )
+      gameGrid.appendChild(cardDiv)
+    }
+    document.body.appendChild(gameGrid)
+  }
 
-  // create board
+  root() {
+    return this.elt
+  }
+
+  update_card(card){
+    console.log("hello update card")
+    let eltCard = document.getElementById(card);
+
+    eltCard.classList.remove("hidden", "chosen", "revealed")
+    switch(this.model.board[card].state){
+      case 0:
+        eltCard.classList.add("hidden")
+        break
+      case 1:
+        eltCard.classList.add("chosen")
+        break
+      case 2:
+        eltCard.classList.add("revealed")
+    }
+  }
 
 }
 
