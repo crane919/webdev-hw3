@@ -55,7 +55,6 @@ button {
 }
 .hidden {
     background-color: #666666;
-    background-image: url("shapes/card-bg.jpg");
 }
 .hidden:hover {
     background-color: #333333;

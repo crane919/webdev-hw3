@@ -47,6 +47,7 @@ class Model {
     this.board = this.createBoard(6)
     this.pos1 = null
     this.pos2 = null
+    this.round = null
     // add current round state, increments every time we get a match
     // game over state
     this.changedCardSubscribers = []
