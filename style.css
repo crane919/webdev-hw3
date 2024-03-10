@@ -35,7 +35,11 @@ button {
     color: blanchedalmond;
     border-color: #222222;
     font-size: large;
+    text-align: center;
 }
+button:hover {
+    cursor: pointer;
+} 
 #game-grid {
     display: grid;
     justify-items: center;
@@ -69,4 +73,9 @@ button {
 }
 .chosen {
     border: solid 2px #666666;
+}
+#bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

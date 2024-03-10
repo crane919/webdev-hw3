@@ -43,15 +43,11 @@ create(tag, attr, id) {
 class Model {
 
   constructor() {
-    console.log('Set up the initial model state here')
     this.board = this.createBoard(6)
     this.pos1 = null
     this.pos2 = null
     this.round = 1
-    // add current round state, increments every time we get a match
-    // game over state
-    this.changedCardSubscribers = []
-    console.log(this.board)
+    this.matches = 0
   }
 
   helper(board, size, j) {
@@ -75,9 +71,7 @@ class Model {
     return board
   }
 
-  subChangeCard(card){
-    this.changedCardSubscribers.push(card)
-  }
+  
 
   // Actions.
   actionChooseCard(card) {
@@ -97,6 +91,7 @@ class Model {
       if (this.board[this.pos1].card == this.board[this.pos2].card){
         this.board[this.pos1].state = 2
         this.board[this.pos2].state = 2
+        this.matches += 1
       } else {
         this.board[this.pos1].state = 0
         this.board[this.pos2].state = 0
@@ -105,8 +100,14 @@ class Model {
   }
 
   actionNewGame() {
+    this.board = this.createBoard(6)
+    this.pos1 = null
+    this.pos2 = null
+    this.round = 1
+    this.matches = 0
+    elt("congrats-board").style.display = "none"
+
   }
-  // reset everything
   
 
 }
@@ -117,17 +118,14 @@ class BoardView {
   constructor(m) {
     // subscription to model (change card)
     this.model = m
-    console.log('Set up board view here')
     this.create_board()
   }
 
   create_board(){
-    console.log("It's time to create the board")
     const gameGrid = create('div', -1, 'game-grid')
     // Create and append the card elements
     for (let i = 0; i < 12; i++) {
       const cardDiv = create('div',  {'class':'card hidden', 'data_value':this.model.board[i].card}, i) 
-      // cardDiv.addEventListener('click', () => { this.model.actionChooseCard(i)} )
       gameGrid.appendChild(cardDiv)
     }
     document.body.appendChild(gameGrid)
@@ -142,50 +140,49 @@ class CardController {
   constructor(m) {
     this.model = m
     this.shape_mapping = {"0":"url('shapes/red-circ.svg')", "1":"url('shapes/blu-circ.svg')", "2":"url('shapes/grn-circ.svg')", "3":"url('shapes/red-rect.svg')", "4":"url('shapes/blu-rect.svg')", "5":"url('shapes/grn-rect.svg')"}
-    console.log('Set up card controller here aaaaaaaaaa')
     for (let i = 0; i < 12; i++) {
       elt(i).addEventListener('click', () => { this.handleClick(i)} )
     }
+    this.can_click = true
   }
 
   handleClick(card){
-    console.log("hello i was clicked", card)
-    this.model.actionChooseCard(card) // call choose card
-    // either pos1 or pos 2 will be updated
-    this.update_card(card) // update_card
-    // check match logic time
-    if (this.model.pos1 != null && this.model.pos2 != null){
-      // check match
-      this.model.actionChooseCard(card) //update model array
-      if (this.model.board[this.model.pos1].card == this.model.board[this.model.pos2].card) {
-        // this a match
-        this.update_card(this.model.pos1)
-        this.update_card(this.model.pos2)
-        this.model.pos1 = null
-        this.model.pos2 = null        
-      } else {
-        // this not a match
-        console.log(this.model.board)
-        setTimeout(() => {
+    if (this.can_click) {
+      this.model.actionChooseCard(card) // call choose card
+      // either pos1 or pos 2 will be updated
+      this.update_card(card) // update_card
+      // check match logic time
+      if (this.model.pos1 != null && this.model.pos2 != null){
+        // check match
+        this.model.actionChooseCard(card) //update model array
+        if (this.model.board[this.model.pos1].card == this.model.board[this.model.pos2].card) {
+          // this a match
           this.update_card(this.model.pos1)
           this.update_card(this.model.pos2)
           this.model.pos1 = null
-          this.model.pos2 = null
-        }, 1000)
+          this.model.pos2 = null        
+        } else {
+          // this not a match
+          this.can_click = false
+          setTimeout(() => {
+            this.update_card(this.model.pos1)
+            this.update_card(this.model.pos2)
+            this.model.pos1 = null
+            this.model.pos2 = null
+            this.can_click = true
+          }, 1000)
+        }
+        // update round counter
+        elt('counter').textContent = "Round: " + this.model.round;
       }
-      // update round counter
-      elt('counter').textContent = "Round: " + this.model.round;
     }
-  }
+  }  
 
   update_card(card){
-    console.log("hello update card")
-    console.log(card, "this is card")
-    elt(card).classList.remove("hidden", "chosen", "revealed")
+     elt(card).classList.remove("hidden", "chosen", "revealed")
     switch(this.model.board[card].state){
       case 0:
         elt(card).classList.add("hidden")
-        console.log("noneeee")
         elt(card).style.backgroundImage = "url('./shapes/card-bg.jpg')"
         break
       case 1:
@@ -195,7 +192,6 @@ class CardController {
         break
       case 2:
         elt(card).classList.add("revealed")
-        console.log(this.shape_mapping)
         elt(card).style.backgroundImage = this.shape_mapping[this.model.board[card].card];
 
     }
@@ -208,7 +204,6 @@ class RoundView {
 
   constructor(m) {
     this.model = m
-    console.log('Set up round view here')
     this.render()
   }
 
@@ -224,17 +219,64 @@ class FinishedView {
 
   constructor(m) {
     this.model = m
-    console.log('Set up finished view here')
+    this.renderNewGame()
+    this.renderWin()
   }
-  // subscription to game finished notif
-  // display start new game button and finished box
+
+  renderNewGame(){
+    const bottom = create('div', -1, 'bottom')
+    const newGame = create('button', -1, 'newGame')
+    newGame.textContent = "Start New Game"
+    document.body.appendChild(bottom)
+    bottom.appendChild(newGame)
+  }
+
+  renderWin(){
+    const div = create('div', -1, 'congrats-board')
+    const congrats = create('h2', -1, "congrats")
+    congrats.textContent = "Congratulations"
+    const button = create('button', -1, "play-again")
+    button.textContent = "Play Again"
+    document.body.appendChild(div)
+    div.appendChild(congrats)
+    div.appendChild(button)
+    div.style.display = "none"
+  }
+
 }
 
 
 class NewGameController {
   constructor(m) {
     this.model = m
-    console.log('Set up new game controller here')
+    elt('newGame').addEventListener('click', () => { this.handleNewGame()} )
+    elt("play-again").addEventListener('click', () => { this.handleNewGame()})
+    for (let i = 0; i < 12; i++) {
+      elt(i).addEventListener('click', () => { this.checkWin(i)} )
+    }
   }
+
+  handleNewGame(){
+    this.model.actionNewGame()
+    this.resetBoard()
+  }
+
+  resetBoard(){
+    for (let card = 0; card<12; card++){
+      card = card.toString()
+      elt(card).classList.remove("hidden", "chosen", "revealed")
+      elt(card).classList.add("hidden")
+      elt(card).style.backgroundImage = "url('./shapes/card-bg.jpg')"
+    }
+    elt('counter').textContent = "Round: " + this.model.round;
+  }
+
+  checkWin(){
+    if (this.model.matches == 6){
+      elt('congrats-board').style.display= "flex"
+    }
+  }
+
+
   // invoke start new game action
 }
