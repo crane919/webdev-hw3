@@ -1,5 +1,5 @@
 
-// Team members:
+// Team members: Maya Cranor and AJ Evans
 
 
 // This initializes the application.
@@ -15,18 +15,12 @@ window.onload = () => {
   new NewGameController(model)
 }
 
-
-// You can add new classes, new methods, anything that can help you.
-// You can also change the parameters to existing methods.
-// The current parameters are there mostly to get you started.
-
 function elt(id) {
   // useful shortcut
   return document.getElementById(id)
 }
 
-function 
-create(tag, attr, id) {
+function create(tag, attr, id) {
   const elt = document.createElement(tag)
   if (id != -1) {
     elt.id = id.toString()
@@ -41,7 +35,6 @@ create(tag, attr, id) {
 
 
 class Model {
-
   constructor() {
     this.board = this.createBoard(6)
     this.pos1 = null
@@ -70,8 +63,6 @@ class Model {
     }
     return board
   }
-
-  
 
   // Actions.
   actionChooseCard(card) {
@@ -108,8 +99,6 @@ class Model {
     elt("congrats-board").style.display = "none"
 
   }
-  
-
 }
 
 
@@ -130,8 +119,6 @@ class BoardView {
     }
     document.body.appendChild(gameGrid)
   }
- 
-
 }
 
 
@@ -193,10 +180,8 @@ class CardController {
       case 2:
         elt(card).classList.add("revealed")
         elt(card).style.backgroundImage = this.shape_mapping[this.model.board[card].card];
-
     }
   }
-
 }
 
 
@@ -276,7 +261,5 @@ class NewGameController {
       elt('congrats-board').style.display= "flex"
     }
   }
-
-
-  // invoke start new game action
 }
+
